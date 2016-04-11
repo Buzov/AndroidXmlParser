@@ -32,6 +32,6 @@ public class WriteAllXmlToXls extends AbstractXmlWorker{
         List<List<String>> bigList = convertMapToList(DomReader.getBigMap(translatable));
         ExelWriter exelWriter = new ExelWriter(ExelType.XLS);
         
-        exelWriter.write(bigList, "C:/Users/artur/Desktop/DiPocket/", "strings_project_final.xls");
+        exelWriter.write(bigList, "c:\\Users\\artur\\Desktop\\PROD_PROD_PROD\\", "strings_project_final.xls");
     }
 }

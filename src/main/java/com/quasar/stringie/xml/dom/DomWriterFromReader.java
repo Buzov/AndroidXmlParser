@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -83,17 +84,34 @@ public class DomWriterFromReader {
 
                 if (map.containsKey(element.getName())) {
                     List<String> list = map.get(element.getName());
-                    if (!element.getValue().equals(list.get(position))) {
+                    String stringElement = element.getValue().trim();
+                    String stringList = list.get(position).trim();
+                    if (!stringElement.equals(stringList)) {
                         //element.setValue(list.get(position));
+                        System.out.println(element.getValue() + " -> " + list.get(position));
                         currentNode.setTextContent(list.get(position));
+
                     }
                 }
 
             }
         }
-        
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        //tf.setAttribute("indent-number", new Integer(2));
+
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        //transformer.setOutputProperty("b;http://xml.apache.org/xsltd;indent-amount", "4");
+        //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        //transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        //transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
         // Запись в файл:
+        doc.setXmlStandalone(true);
         transformer.transform(new DOMSource(doc), new StreamResult(new FileOutputStream(file)));
 
     }

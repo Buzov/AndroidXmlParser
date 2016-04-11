@@ -35,7 +35,7 @@ public class RewriteAllXmlFromXls extends AbstractXmlWorker{
         ExelReader exelReader = new ExelReader(ExelType.XLSX);
         Map<String, Map<String, List<String>>> bigMap = new TreeMap<>();
         try {
-            List<List<String>> listAllStrings = exelReader.readOnlyStrings("C:/Users/artur/Desktop/DiPocket/Strings_tran.xlsx");
+            List<List<String>> listAllStrings = exelReader.readOnlyStrings("c:\\Users\\artur\\Desktop\\PROD_PROD_PROD\\App_text_and_localization.xlsx");
             for (List<String> row : listAllStrings) {
                 if (!row.isEmpty()) {
                     String nameFile = row.get(NAME_FILE_POSITION);
@@ -73,7 +73,7 @@ public class RewriteAllXmlFromXls extends AbstractXmlWorker{
             domWriter.getStringsMapFromXML(new File(pathToPlXml + f.getName()), 1);
         }
         
-        printMap(bigMap);
+        //printMap(bigMap);
         List<List<String>> bigList = convertMapToList(bigMap);
 //        ExelWriter exelWriter = new ExelWriter(ExelType.XLS);
 //        try {

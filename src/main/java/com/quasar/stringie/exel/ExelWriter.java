@@ -29,8 +29,8 @@ public class ExelWriter {
      private static Cell cell;
      */
     private static Font font;
-    private static CellStyle cellstyle_0;
-    private static CellStyle cellstyle_1;
+    private static CellStyle cellstyleFillRed;
+    private static CellStyle cellstyleDef;
     private static CellStyle cellstyle_2;
     private static CellStyle cellstyle_3;
     private static CellStyle cellstyle_4;
@@ -50,19 +50,23 @@ public class ExelWriter {
     public void write(List<List<String>> list, String path, String name) throws FileNotFoundException, IOException {
         Workbook workbook = getWorkbook();
         Sheet sheet = getSheet(workbook, name);
+
         for (int i = 0; i < list.size(); i++) {
             Row row = getRow(i, sheet);
             for (int j = 0; j < list.get(i).size(); j++) {
-                if(i == list.size() - 1) {
-                    sheet.autoSizeColumn(j);
-                } 
+                if (i == list.size() - 1) {
+                    sheet.setColumnWidth(j, 10000);
+                    //sheet.autoSizeColumn(j);
+                }
                 Cell c = getCell(row, j);
                 String s = list.get(i).get(j);
-                if(s != null) {
+                if (s != null) {
                     s = s.trim();
+                    c.setCellStyle(getCellStyleDef(null, workbook));
+                } else {
+                    c.setCellStyle(getCellStyle(null, workbook));
                 }
                 c.setCellValue(s);
-                c.setCellStyle(cellstyle_0);
             }
         }
         try (FileOutputStream fs = new FileOutputStream(path + name)) {
@@ -70,7 +74,7 @@ public class ExelWriter {
         }
         workbook.close();
     }
-    
+
     public ExelType getExelType() {
         return exelType;
     }
@@ -93,10 +97,8 @@ public class ExelWriter {
         Sheet sheet = workbook.createSheet(WorkbookUtil.createSafeSheetName(name));
         // Set the width (in units of 1/256th of a character width)
         /*sheet.setColumnWidth(1, 5000);*/
-        
-        
-        /*sheet.addMergedRegion(new CellRangeAddress(0, 4, 4, 8));*/
 
+        /*sheet.addMergedRegion(new CellRangeAddress(0, 4, 4, 8));*/
         return sheet;
     }
 
@@ -114,21 +116,34 @@ public class ExelWriter {
     }
 
     private CellStyle getCellStyle(Font font, Workbook workbook) {
-        CellStyle cellstyle = null;
-        /*if (cellstyle == null) {*/
-            cellstyle = workbook.createCellStyle();
-            cellstyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-            cellstyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
-            cellstyle.setFillBackgroundColor(IndexedColors.GREEN.getIndex());
-            cellstyle.setAlignment(CellStyle.ALIGN_CENTER);
-            cellstyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
-            cellstyle.setBorderBottom(CellStyle.BORDER_DASH_DOT_DOT);
-            cellstyle.setBottomBorderColor(IndexedColors.GREEN.getIndex());
+        if (cellstyleFillRed == null) {
+            cellstyleFillRed = workbook.createCellStyle();
+            cellstyleFillRed.setFillPattern(CellStyle.SOLID_FOREGROUND);
+            cellstyleFillRed.setFillForegroundColor(IndexedColors.RED.getIndex());
+            cellstyleFillRed.setFillBackgroundColor(IndexedColors.GREEN.getIndex());
+            //cellstyle_fill_red.setAlignment(CellStyle.ALIGN_CENTER);
+            cellstyleFillRed.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+            cellstyleFillRed.setWrapText(true);
+            //cellstyle_fill_red.setWrapText(true);
+            //cellstyle_fill_red.setBorderBottom(CellStyle.BORDER_DASH_DOT_DOT);
+            //cellstyle_fill_red.setBottomBorderColor(IndexedColors.GREEN.getIndex());
             if (font != null) {
-                cellstyle.setFont(font);
+                cellstyleFillRed.setFont(font);
             }
-        /*}*/
-        return cellstyle;
+        }
+        return cellstyleFillRed;
+    }
+    
+    private CellStyle getCellStyleDef(Font font, Workbook workbook) {
+        if (cellstyleDef == null) {
+            cellstyleDef = workbook.createCellStyle();
+            cellstyleDef.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+            cellstyleDef.setWrapText(true);
+            if (font != null) {
+                cellstyleDef.setFont(font);
+            }
+        }
+        return cellstyleDef;
     }
 
     private Font getFont(Workbook workbook) {
@@ -143,20 +158,19 @@ public class ExelWriter {
         }
         return font;
     }
-    
+
     public static void main(String[] args) throws IOException {
         List<List<Object>> list = new ArrayList<>();
-        for(int i = 0; i < 65000; i++) {
+        for (int i = 0; i < 65000; i++) {
             List<Object> l = new ArrayList<>();
-            for(int j = 0; j < 5; j++) {
-                l.add("" + i + j + "word"+ "abcdfgeklomprqzx");
+            for (int j = 0; j < 5; j++) {
+                l.add("" + i + j + "word" + "abcdfgeklomprqzx");
             }
             list.add(l);
         }
         ExelWriter ew = new ExelWriter(ExelType.XLSX);
-        
+
             //ew.write(list, "./word.xlsx", "word");
-        
     }
 
 }
