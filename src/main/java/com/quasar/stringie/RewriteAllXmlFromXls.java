@@ -2,7 +2,11 @@ package com.quasar.stringie;
 
 import com.quasar.stringie.exel.ExelReader;
 import com.quasar.stringie.exel.ExelType;
+import com.quasar.stringie.exel.ValidatorXlsKeysWords;
+import com.quasar.stringie.exel.XlsStructureException;
 import com.quasar.stringie.fileio.ListerOnlyXmlWithStrings;
+import com.quasar.stringie.fileio.google.GoogleException;
+import com.quasar.stringie.fileio.google.MainGoogleDownloader;
 import com.quasar.stringie.xml.dom.DomWriterFromReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,6 +28,8 @@ public class RewriteAllXmlFromXls extends AbstractXmlWorker{
     public static final String pathToEnXml = "d:\\Projects\\Dipocket\\Android\\trunk\\DiPocketApp\\res\\values\\";
     public static final String pathToPlXml = "d:\\Projects\\Dipocket\\Android\\trunk\\DiPocketApp\\res\\values-pl\\";
     
+    public static final String pathToFileXls = ".\\App_text_and_localization.xlsx";
+    
 //    public static final String pathToEnXml = "D:\\Projects\\Dipocket\\Android\\test\\values\\";
 //    public static final String pathToPlXml = "D:\\Projects\\Dipocket\\Android\\test\\values-pl\\";
     
@@ -35,7 +41,9 @@ public class RewriteAllXmlFromXls extends AbstractXmlWorker{
         ExelReader exelReader = new ExelReader(ExelType.XLSX);
         Map<String, Map<String, List<String>>> bigMap = new TreeMap<>();
         try {
-            List<List<String>> listAllStrings = exelReader.readOnlyStrings("c:\\Users\\artur\\Desktop\\PROD_PROD_PROD\\App_text_and_localization.xlsx");
+            MainGoogleDownloader.dowloadXlsFile(pathToFileXls, null);
+            List<List<String>> listAllStrings = exelReader.readOnlyStrings(pathToFileXls);
+            ValidatorXlsKeysWords.validate(listAllStrings);
             for (List<String> row : listAllStrings) {
                 if (!row.isEmpty()) {
                     String nameFile = row.get(NAME_FILE_POSITION);
@@ -65,6 +73,10 @@ public class RewriteAllXmlFromXls extends AbstractXmlWorker{
             }
         } catch (IOException ex) {
             Logger.getLogger(RewriteAllXmlFromXls.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GoogleException ex) {
+            System.out.println("Download filed!!!");
+        } catch (XlsStructureException ex) {
+            System.out.println("Incorrect file structure!!!");
         }
         List<File> listFile = ListerOnlyXmlWithStrings.getFilesList(pathToEnXml);
         DomWriterFromReader domWriter = new DomWriterFromReader(bigMap);
